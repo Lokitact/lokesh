@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en" data-loki-theme="auto" data-loki-theme-color="green" class="h-100">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Fancy Border Radius Generator</title>
+
+  <!-- Vendor CSS Files -->
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Template Main CSS File -->
+  <link href="../assets/css/loki.css" rel="stylesheet" />
+  <script>
+    document.documentElement.setAttribute("data-loki-theme-color", localStorage.getItem("data-loki-theme-color"));
+    document.documentElement.setAttribute("data-loki-theme", localStorage.getItem("theme"));
+    document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("theme"));
+  </script>
+  <style>
+    .generator {
+      width: 60vmin;
+      height: 60vmin;
+      border: 2px dashed var(--loki-tertiary-color);
+      position: relative;
+      margin: auto
+    }
+
+    @media screen and (min-width: 31.875rem) {
+      .generator {
+        width: 50vmin;
+        height: 50vmin
+      }
+    }
+
+    .generator__shape {
+      width: 100%;
+      height: 100%;
+      background: var(--loki-theme-color);
+      border-radius: 30% 70% 70% 30%/30% 30% 70% 70%;
+      box-shadow: var(--loki-box-shadow);
+    }
+
+    .generator__handle {
+      display: block;
+      position: absolute;
+      cursor: pointer;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .generator__handle:before {
+      content: "";
+      position: absolute;
+      width: 1rem;
+      height: 1rem;
+      left: .75rem;
+      top: .75rem;
+      background: var(--loki-text-color);
+      border: 2px solid var(--loki-background-color);
+      transition: box-shadow .2s ease-out;
+      border-radius: 50px;
+      will-change: box-shadow
+    }
+
+    .generator__handle.active:before {
+      background: var(--loki-tertiary-color);
+      box-shadow: 0 0 0 4px var(--loki-text-color);
+      border: 2px solid var(--loki-theme-color)
+    }
+
+    .generator #top {
+      top: -1.25rem;
+      left: 30%;
+      transform: translate(-50%)
+    }
+
+    .generator #bottom {
+      bottom: -1.25rem;
+      left: 30%;
+      transform: translate(-50%)
+    }
+
+    .generator #left {
+      left: -1.25rem;
+      top: 30%;
+      transform: translateY(-50%)
+    }
+
+    .generator #right {
+      right: -1.25rem;
+      top: 30%;
+      transform: translateY(-50%)
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column h-100">
+
+  <div class="container bg-body-tertiary">
+    <h2 class="text-center mt-1 mb-4">Fancy Border Radius Generator</h2>
+
+    <div class="generator" id="box">
+      <div class="generator__shape" id="shape"></div>
+      <span class="generator__handle" id="left"></span>
+      <span class="generator__handle" id="top"></span>
+      <span class="generator__handle" id="right"></span>
+      <span class="generator__handle" id="bottom"></span>
+    </div>
+    <div class="show-container mt-3 mt-md-5 copy-hint"> <textarea class="copy-content loki-color w-100 p-2" id="code" disabled></textarea>
+      <i class="bi bi-copy mx-2 btn btn-loki" onclick="copyDataURI()"></i>
+    </div>
+  </div>
+
+  <script>
+    class u {
+      constructor({
+        shapeElemId: t = "shape",
+        generatorElemId: i = "code",
+        boxContainerId: s = "box",
+        initState: l = null,
+        moveableElems: r
+      } = {}) {
+        this.generatorElem = document.getElementById(i),
+          this.shapeElem = document.getElementById(t),
+          this.boxContainer = document.getElementById(s),
+          this.initState(l),
+          this.handles = this.initHandles(r)
+      }
+
+      initHandles(t) {
+        throw new Error("You have to implement the method initHandles!")
+      }
+
+      updateBorderRadius() {
+        throw new Error("You have to implement the method updateBorderRadius!")
+      }
+
+      initState(t) {
+        throw new Error("You have to implement the method initState!")
+      }
+
+      updateState(t, i) {
+        this.state[i] = t, this.updateUI()
+      }
+
+      updateUI() {
+        this.updateBorderRadius()
+      }
+
+      saveUrlParams() {
+        throw new Error("You have to implement the method saveUrlParams!")
+      }
+    }
+
+    class c {
+      constructor(t, i, n = "x", e = 30, s = () => {}) {
+        this.axis = n,
+          this.elem = t,
+          this.onChange = i,
+          this.onDragEnd = s,
+          this.elem.onmousedown = this.dragMouseDown.bind(this),
+          this.elem.ontouchstart = this.dragMouseDown.bind(this),
+          this.onChange(this.elem.id)
+      }
+
+      dragMouseDown(t) {
+        t = t || window.event, t.preventDefault(),
+          this.currentSpan = t.target,
+          this.currentSpan.classList.add("active"),
+          document.onmouseup = this.closeDragElement.bind(this),
+          document.ontouchend = this.closeDragElement.bind(this),
+          document.onmousemove = this.elementDrag.bind(this),
+          document.ontouchmove = this.elementDrag.bind(this)
+      }
+
+      elementDrag(t) {
+        if (t = t || window.event, typeof TouchEvent < "u" && t instanceof TouchEvent) {
+          var i = t.changedTouches[0];
+          this.setPos(i.clientX, i.clientY)
+        } else this.setPos(t.clientX, t.clientY)
+      }
+
+      setInitPos(t) {
+        this.axis == "x" ? this.elem.style.left = t + "%" : this.elem.style.top = t + "%"
+      }
+
+      setPos(t, i) {
+        let n = this.elem.parentNode.getBoundingClientRect();
+        this.axis == "x" ? (this.pos = this.valBetween(((t - 5 - n.left).toFixed(0) * 100 / n.width).toFixed(0), 0, 100),
+            this.elem.style.left = this.pos + "%") : (this.pos = this.valBetween(((i - 5 - n.top).toFixed(0) * 100 / n.height).toFixed(0), 0, 100),
+            this.elem.style.top = this.pos + "%"),
+          this.onChange(this.pos, this.elem.id)
+      }
+
+      closeDragElement() {
+        this.currentSpan.classList.remove("active"),
+          document.onmouseup = null,
+          document.onmousemove = null,
+          document.ontouchend = null,
+          document.ontouchmove = null
+      }
+      valBetween(t, i, n) {
+        return Math.min(n, Math.max(i, t))
+      }
+    }
+
+    class i extends u {
+      initState(t) {
+        let s = {
+          left: 30,
+          right: 30,
+          top: 30,
+          bottom: 30
+        };
+        this.state = t == null ? s : t
+      }
+
+      initHandles(t) {
+        return {
+          left: new c(t.left, this.updateState.bind(this), "y", this.state.left, this.saveUrlParams.bind(this)),
+          right: new c(t.right, this.updateState.bind(this), "y", this.state.right, this.saveUrlParams.bind(this)),
+          top: new c(t.top, this.updateState.bind(this), "x", this.state.top, this.saveUrlParams.bind(this)),
+          bottom: new c(t.bottom, this.updateState.bind(this), "x", this.state.bottom, this.saveUrlParams.bind(this))
+        }
+      }
+
+      updateBorderRadius() {
+        var t = this.state.top + "% ";
+        t += 100 - this.state.top + "% ",
+          t += 100 - this.state.bottom + "% ",
+          t += this.state.bottom + "% / ",
+          t += this.state.left + "% ",
+          t += this.state.right + "% ",
+          t += 100 - this.state.right + "% ",
+          t += 100 - this.state.left + "% ",
+          this.shapeElem.style["border-radius"] = t,
+          this.generatorElem.innerHTML = t
+      }
+
+      saveUrlParams() {
+        const {
+          left: t,
+          top: s,
+          right: a,
+          bottom: h
+        } = this.state;
+        let d = `${t}.${s}.${a}.${h}`;
+        this.setUrlHash(d)
+      }
+    }
+    var l = {
+      left: document.getElementById("left"),
+      right: document.getElementById("right"),
+      bottom: document.getElementById("bottom"),
+      top: document.getElementById("top")
+    };
+
+    new i({
+      moveableElems: l,
+    });
+  </script>
+
+  <!-- ======= Theme ======= -->
+  <loki-theme class="btn-loki position-fixed bottom-0 end-0 mb-3 me-3 rounded-2"></loki-theme>
+
+  <!-- ======= Footer ======= -->
+  <loki-footer class="mt-auto loki-fill-ter"></loki-footer>
+
+  <!-- Vendor JS Files -->
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../assets/js/loki.js"></script>
+
+</body>
+
+</html>
