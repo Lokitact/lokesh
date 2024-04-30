@@ -3,6 +3,29 @@
   font-size: calc(7rem + 7vw);
   font-family: serif;
   fill: none;
+  stroke-wihdth: 7;
+  stroke-linejoin: round;
+  stroke-dasharray: 70 330;
+  stroke-dashoffset: 0;
+  -webkit-animation: stroke 6s infinite linear;
+  animation: stroke 6s infinite linear;
+  letter-spacing: 15px;
+  font-weight: 700;
+}
+@media (min-width:1024px) {
+.text{
+font-size:calc(3rem + 7vw);
+}
+}
+@media (min-width:2560px) {
+.text{
+font-size:calc(3rem + 3vw);
+}
+}
+.text {
+  font-size: calc(7rem + 7vw);
+  font-family: serif;
+  fill: none;
   stroke-width: 7;
   stroke-linejoin: round;
   stroke-dasharray: 70 330;
@@ -356,7 +379,7 @@
   }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 997px) {
   .header-content {
     display: none;
   }
@@ -926,6 +949,9 @@
 }
 
 /* ------- # Profile CV ------- */
+.resume-img {
+height: 27vh;
+}
 .profile-image-content {
   padding: 2px;
   border-radius: 0.375rem 0.375rem;
