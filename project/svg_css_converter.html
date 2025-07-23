@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-loki-theme="auto" data-loki-theme-color="green" class="h-100">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>SVG to CSS converter | SVG Backgrounds</title>
+
+  <meta name="author" content="lokesh" />
+  <meta content=" This webpage convert symbol to code, code to symbol" name="description" />
+
+  <!-- Vendor CSS Files -->
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Template Main CSS File -->
+  <link href="../assets/css/loki.css" rel="stylesheet" />
+  <script>
+    document.documentElement.setAttribute("data-loki-theme-color", localStorage.getItem("data-loki-theme-color"));
+    document.documentElement.setAttribute("data-loki-theme", localStorage.getItem("theme"));
+    document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("theme"));
+  </script>
+
+</head>
+
+<body class="d-flex flex-column h-100">
+
+  <div class="container bg-body-tertiary">
+    <h2 class="text-center mt-1 mb-4">Svg to Css Code Converter</h2>
+    <div id="content-wrap" class="row row-cols-1 row-cols-md-2">
+      <div class="col themed-grid-col">
+        <h3 class="text-muted">Insert Svg code:</h3>
+        <textarea class="w-100" id="codeInputer" rows="24" oninput="transformCode()"></textarea>
+      </div>
+      <div class="col themed-grid-col">
+        <h3 class="text-muted">Output:</h3>
+
+        <div class="container-inside copy-hint">
+          <i class="bi bi-copy btn btn-loki position-absolute bottom-0 end-0 me-3 mb-3" onclick="copyDataURI()"></i>
+          <textarea class="copy-content" id="codeOutputer" rows="24"></textarea>
+        </div>
+      </div>
+
+      <fieldset class="col themed-grid-col p-3">
+        <legend class="text-muted">Browser support:</legend>
+        <div class="m-2">
+          <input type="radio" id="modern" class="form-check-input me-1" name="browser" value="modern" checked onclick="transformCode()">
+          <label for="modern">Modern</label>
+        </div>
+        <div class="m-2">
+          <input type="radio" id="legacy" class="form-check-input me-1" name="browser" value="legacy" onclick="transformCode()">
+          <label for="legacy">Legacy (IE9+)</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="col themed-grid-col p-3">
+        <legend class="text-muted">CSS Helpers:</legend>
+        <div class="m-2">
+          <input type="radio" id="url_wrapper" class="form-check-input me-1" name="helpers" value="url_wrapper" checked onclick="transformCode()">
+          <label for="url_wrapper">URL wrapper</label>
+        </div>
+        <div class="m-2">
+          <input type="radio" id="basic_bg" class="form-check-input me-1" name="helpers" value="basic_bg" onclick="transformCode()">
+          <label for="basic_bg">Basic background-image</label>
+        </div>
+        <div class="m-2">
+          <input type="radio" id="advanced_bg" class="form-check-input me-1" name="helpers" value="advanced_bg" onclick="transformCode()">
+          <label for="advanced_bg">Advanced background-image</label>
+        </div>
+        <div class="m-2">
+          <input type="radio" id="li_bullet" class="form-check-input me-1" name="helpers" value="li_bullet" onclick="transformCode()">
+          <label for="li_bullet">CSS bullets (list-style-image)</label>
+        </div>
+        <div class="m-2">
+          <input type="radio" id="inside" class="form-check-input me-1" name="helpers" value="inside" onclick="transformCode()">
+          <label for="inside">Inside class</label>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+
+  <script>
+    "use strict";
+
+    function transformCode() {
+      var modern_browsers = "modern" == document.querySelector('input[name="browser"]:checked').value ? true : false;
+      var CSS_helper = document.querySelector('input[name="helpers"]:checked').value;
+      var inputSVG = document.getElementById('codeInputer').value;
+      var outputer = document.getElementById('codeOutputer');
+      if (inputSVG.length < 20) {
+        outputer.innerHTML = '';
+        return;
+      }
+      var dataURI = modern_browsers ? modern_SVG2CSS(inputSVG) : legacy_SVG2CSS(inputSVG);
+      var THE_OUTPUT = dataURI;
+      switch (CSS_helper) {
+        case "basic_bg":
+          THE_OUTPUT = 'background-image: ' + dataURI + ';';
+          break;
+        case "advanced_bg":
+          THE_OUTPUT = '/* background-color: #FFFFFF; */\n' +
+            'background-image: ' + dataURI + ';\n' +
+            '/* background-attachment: fixed | scroll; */\n' +
+            '/* background-size: auto | cover | contain | 500px 250px; */\n' +
+            '/* background-position: center | right 30px bottom 15px; */\n' +
+            '/* background-repeat: no-repeat | repeat | repeat-x; */\n' +
+            '/* background-origin: border-box | padding-box | content-box; */\n' +
+            '/* background-clip: border-box | padding-box | content-box; */\n' +
+            '/* background-blend-mode: multiply | screen | overlay; */';
+          break;
+        case "li_bullet":
+          var shifter = 'svg transform="scale(0.5) translate(0, 10)" transform-origin="center" '
+          var dataURIwTransform = dataURI.replace(/svg /i, shifter);
+          THE_OUTPUT = 'li{\n'
+            //+ '	list-style-image: ' + dataURI + ';\n'
+            +
+            '	list-style-image: ' + dataURIwTransform + ';' +
+            '/* Use translate(X, Y) to position the SVG up, down, left, and right */\n' +
+            '}\n' +
+            'li::marker{\n' +
+            '	font-size: 1.5em;\n' +
+            '	line-height: 0.1em;\n' +
+            '}';
+          break;
+        case "inside":
+          THE_OUTPUT = '.your-class{\n	background-image: ' + dataURI + ';\n' + '}';
+          break;
+        default: //url_wrapper
+          THE_OUTPUT = dataURI;
+      }
+      outputer.innerHTML = THE_OUTPUT;
+    }
+
+    function modern_SVG2CSS(SVG_input) {
+      var safe_svg = SVG_input.replace(/#/g, "%23")
+        .replace(/\?/g, "%3F") //probably don't have ? marks in SVG		
+        .replace(/[\t\n\r]/gm, '') //remove tabs and new lines
+        .replace(/\s\s+/g, ' ') //replace multiple spaces with a single space
+        .replace(/'/g, '"') //replace single quotes with double
+        .replace(/> </g, '><');
+
+      return "url('data:image/svg+xml," + safe_svg + "')";
+      //new approach: https://www.youtube.com/watch?v=6qSN50Qk_54	
+    }
+
+    function legacy_SVG2CSS(SVG_input) {
+      SVG_input = SVG_input.replace(/\r?\n|\r/g, '');
+      SVG_input = SVG_input.replace(/ +(?= )/g, '');
+      var uriPayload = encodeURIComponent(SVG_input) // encode URL-unsafe characters
+        .replace(/%0A/g, '') // remove newlines
+        .replace(/%20/g, ' ') // put spaces back in
+        .replace(/%3D/g, '=') // ditto equals signs
+        .replace(/%3A/g, ':') // ditto colons
+        .replace(/%2F/g, '/') // ditto slashes
+        .replace(/%2C/g, ' ') // replace commas with spaces
+        .replace(/%22 \//g, '%22/') //remove space before self-closing tag
+        .replace(/%27/g, "'") // replace both encoded single- and double-quotes to double
+        .replace(/%22/g, "'") // 
+        //.replace(/\'/g, '"') // 
+        //.replace(/\%3E \%3C/g,'%3E%3C') //remove spaces between tags
+        .replace(/%3E %3C/g, '%3E%3C') //remove spaces between tags
+        .replace(/%09/g, ''); //remove tabs	
+      //return  '.your-class{\n' + '	background-image: url("' + svgDATA + uriPayload + '");\n' + '}';
+      return 'url("data:image/svg+xml,' + uriPayload + '")';
+      //old approach: https://codepen.io/tigt/post/optimizing-svgs-in-data-uris	
+
+    }
+  </script>
+
+  <!-- ======= Theme ======= -->
+  <loki-theme class="btn-loki position-fixed bottom-0 end-0 mb-3 me-3 rounded-2"></loki-theme>
+
+  <!-- ======= Footer ======= -->
+  <loki-footer class="mt-auto loki-fill-ter"></loki-footer>
+
+  <!-- Vendor JS Files -->
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../assets/js/loki.js"></script>
+
+</body>
+
+</html>

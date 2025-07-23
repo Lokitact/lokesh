@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" data-loki-theme="auto" data-loki-theme-color="green">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>Entity list</title>
+
+  <!-- Vendor CSS Files -->
+  <link href="../assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Template Main CSS File -->
+  <link href="../assets/css/loki.css" rel="stylesheet" />
+
+  <script>
+    document.documentElement.setAttribute("data-loki-theme-color", localStorage.getItem("data-loki-theme-color"));
+    document.documentElement.setAttribute("data-loki-theme", localStorage.getItem("theme"));
+    document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("theme"));
+  </script>
+
+</head>
+
+<body>
+  <div class="container">
+    <div class="row row-cols-3 row-cols-md-6 row-cols-lg-9 gy-2 text-center count-reset" id="entity-content"></div>
+    <p class="code-hint text-center text-muted mt-5"></p>
+  </div>
+
+
+  <script>
+    let startValue = Number(localStorage.getItem("entityListNum"));
+    let endValue = 100;
+
+    let previousCode = '<div class="col themed-grid-col d-symbol d-flex flex-wrap justify-content-center align-items-end" data-symbol="\u00AB" id="previous">Previous</div>';
+    let nextCode = '<div class="col themed-grid-col d-symbol d-flex flex-wrap justify-content-center align-items-end" data-symbol="\u00BB" id="next">Next</div>';
+
+    function setAllValues() {
+      let code = '';
+      for (var l = startValue; l < (startValue + endValue); l++) {
+        code = code + '<div class="col themed-grid-col count-num d-symbol d-flex flex-wrap justify-content-center align-items-end" data-symbol="\u0026\u0023' + l + '\u003B">\u0026\u0023\u0000' + l + '\u003B</div>';
+      }
+
+      if (startValue > 0) {
+        document.getElementById('entity-content').innerHTML = previousCode + code + nextCode;
+        document.getElementById("previous").addEventListener("click", (p) => {
+          p.preventDefault();
+          startValue -= endValue;
+          setAllValues();
+        });
+      } else {
+        document.getElementById('entity-content').innerHTML = code + nextCode;
+      }
+
+      document.getElementById("next").addEventListener("click", (n) => {
+        n.preventDefault();
+        startValue += endValue;
+        setAllValues();
+      });
+
+      document.getElementsByClassName('code-hint')[0].innerHTML = startValue + '\u0020\u002F\u0020' + ((startValue + endValue) - 1);
+
+      localStorage.setItem("entityListNum", startValue);
+    }
+    setAllValues();
+  </script>
+
+  <!-- ======= Theme ======= -->
+  <loki-theme class="btn-loki position-fixed bottom-0 end-0 mb-3 me-3 rounded-2"></loki-theme>
+
+  <!-- ======= Footer ======= -->
+  <loki-footer class="mt-auto loki-fill-ter"></loki-footer>
+
+  <!-- Vendor JS Files -->
+  <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="../assets/js/loki.js"></script>
+
+</body>
+
+</html>

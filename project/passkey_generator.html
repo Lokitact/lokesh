@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  data-loki-theme="auto"
+  data-loki-theme-color="green"
+  class="h-100"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Passkey generator</title>
+
+    <!-- Vendor CSS Files -->
+    <link
+      href="../assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Template Main CSS File -->
+    <link href="../assets/css/loki.css" rel="stylesheet" />
+    <script>
+      document.documentElement.setAttribute(
+        "data-loki-theme-color",
+        localStorage.getItem("data-loki-theme-color")
+      );
+      document.documentElement.setAttribute(
+        "data-loki-theme",
+        localStorage.getItem("theme")
+      );
+      document.documentElement.setAttribute(
+        "data-bs-theme",
+        localStorage.getItem("theme")
+      );
+    </script>
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    <div class="card border-loki m-auto" style="width: 20rem">
+      <div class="card-header border-loki py-3">
+        <h4 class="card-title text-center mb-3">Password Generator</h4>
+        <div class="d-flex align-items-center">
+          <div class="container-inside copy-hint">
+            <input
+              type="text"
+              class="inside-content copy-content counts-input p-1"
+              id="PasswordResult"
+              placeholder="Genrate your passkey"
+              onkeyup="counts()"
+            />
+            <i class="bi bi-copy inside-btn" onclick="copyDataURI()"></i>
+          </div>
+          <button class="btn btn-loki ms-2" id="generateBtn">Genrate</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <label>Password length</label>
+            <input
+              type="number"
+              id="Passwordlength"
+              min="4"
+              max="20"
+              value="8"
+              class="float-end"
+            />
+          </li>
+          <li class="list-group-item">
+            <label>Include uppercase letters</label>
+            <input
+              type="checkbox"
+              id="uppercase"
+              class="form-check-input float-end"
+              checked
+            />
+          </li>
+          <li class="list-group-item">
+            <label>Include lowercase letters</label>
+            <input
+              type="checkbox"
+              id="lowercase"
+              class="form-check-input float-end"
+              checked
+            />
+          </li>
+          <li class="list-group-item">
+            <label>Include numbers</label>
+            <input
+              type="checkbox"
+              id="numbers"
+              class="form-check-input float-end"
+              checked
+            />
+          </li>
+          <li class="list-group-item">
+            <label>Include symbols</label>
+            <input
+              type="checkbox"
+              id="symbols"
+              class="form-check-input float-end"
+              checked
+            />
+          </li>
+          <li class="list-group-item">
+            <button
+              type="button"
+              class="btn btn-loki"
+              data-bs-toggle="modal"
+              data-bs-target="#saveModal"
+              data-bs-whatever="@saveModal"
+              onclick="savePassword()"
+            >
+              Save
+            </button>
+
+            <button
+              class="btn btn-outline-secondary"
+              data-bs-toggle="modal"
+              data-bs-target="#viewModal"
+            >
+              View Saved
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer text-center border-loki">
+        <small class="text-muted">Designed By Lokesh</small>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="saveModal"
+      tabindex="-1"
+      aria-labelledby="saveModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="saveModalLabel">Save Password</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="password-name" class="col-form-label">Name:</label>
+                <input type="text" class="form-control" id="password-name" />
+              </div>
+              <div class="mb-3">
+                <label for="password-text" class="col-form-label"
+                  >Password:</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="password-text"
+                  disabled
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-loki" onclick="savePassword()">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="viewModal"
+      tabindex="-1"
+      aria-labelledby="viewModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="viewModalLabel">Saved Passwords</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="savedPasswordsList">
+            <!-- Passwords will be loaded here dynamically -->
+            <p class="text-muted">No saved passwords found.</p>
+          </div>
+
+          <div class="modal-footer">
+            <button class="btn btn-danger" onclick="deleteAllPasswords()">
+              Delete All
+            </button>
+            <button class="btn btn-success" onclick="exportPasswords()">
+              Export
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function getRandomLower() {
+        return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
+      }
+
+      function getRandomUpper() {
+        return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
+      }
+
+      function getRandomNumber() {
+        return String.fromCharCode(Math.floor(Math.random() * 10) + 48);
+      }
+
+      function getRandomSymbol() {
+        const symbols = "!@#$%^&*(){}[]=<>/,.";
+        return symbols[Math.floor(Math.random() * symbols.length)];
+      }
+
+      // adding a all functions into a object called randomFunc
+
+      const randomFunc = {
+        lower: getRandomLower,
+        upper: getRandomUpper,
+        number: getRandomNumber,
+        symbol: getRandomSymbol,
+      };
+
+      // adding a click event listner to generate button
+
+      const generate = document.getElementById("generateBtn");
+      generate.addEventListener("click", () => {
+        const length = document.getElementById("Passwordlength").value;
+        const hasUpper = document.getElementById("uppercase").checked;
+        const hasLower = document.getElementById("lowercase").checked;
+        const hasNumber = document.getElementById("numbers").checked;
+        const hasSymbol = document.getElementById("symbols").checked;
+        const result = document.getElementById("PasswordResult");
+        result.value = generatePassword(
+          hasLower,
+          hasUpper,
+          hasNumber,
+          hasSymbol,
+          length
+        );
+        counts();
+        // console.log(hasLower, hasUpper, hasNumber, hasSymbol);
+      });
+
+      // function for generating random password
+      function generatePassword(lower, upper, number, symbol, length) {
+        let generatedPassword = "";
+        const typesCount = lower + upper + number + symbol;
+        // filter out unchecked types
+        const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(
+          (item) => Object.values(item)[0]
+        );
+        // console.log(typesArr);
+
+        // creating a loop for calling generator function for each type
+        for (let i = 0; i < length; i += typesCount) {
+          typesArr.forEach((type) => {
+            const funcName = Object.keys(type)[0];
+            generatedPassword += randomFunc[funcName]();
+          });
+        }
+
+        // slicing password from 0 to length
+        const finalPassword = generatedPassword.slice(0, length);
+        return finalPassword;
+      }
+
+      const saveModal = document.getElementById("saveModal");
+      saveModal.addEventListener("show.bs.modal", () => {
+        const password = document.getElementById("PasswordResult").value;
+        document.getElementById("password-text").value = password;
+      });
+
+      function savePassword() {
+        const nameInput = document.getElementById("password-name");
+        const passwordInput = document.getElementById("password-text");
+
+        const name = nameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!name || !password) {
+          alert("Please provide a name and generate a password first.");
+          return;
+        }
+
+        const savedPasswords =
+          JSON.parse(localStorage.getItem("savedPasswords")) || {};
+
+        if (!savedPasswords[name]) {
+          savedPasswords[name] = [];
+        }
+
+        savedPasswords[name].push({
+          value: password,
+          timestamp: new Date().toISOString(),
+        });
+
+        localStorage.setItem("savedPasswords", JSON.stringify(savedPasswords));
+
+        // Optional: Close modal programmatically
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("saveModal")
+        );
+        modal.hide();
+
+        // Clear form fields
+        nameInput.value = "";
+        passwordInput.value = "";
+
+        alert(`Password saved under "${name}".`);
+      }
+
+      const viewModal = document.getElementById("viewModal");
+      viewModal.addEventListener("show.bs.modal", renderSavedPasswords);
+
+      function renderSavedPasswords() {
+        const container = document.getElementById("savedPasswordsList");
+        const savedPasswords =
+          JSON.parse(localStorage.getItem("savedPasswords")) || {};
+
+        if (Object.keys(savedPasswords).length === 0) {
+          container.innerHTML =
+            '<p class="text-muted">No saved passwords found.</p>';
+          return;
+        }
+
+        let html = "";
+        for (const [name, entries] of Object.entries(savedPasswords)) {
+          html += `<div class="mb-3">
+      <h6>${name}</h6>
+      <ul class="list-group">`;
+
+          entries.forEach((entry, index) => {
+            const time = new Date(entry.timestamp).toLocaleString();
+            html += `
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <code>${entry.value}</code>
+            <small class="text-muted d-block">${time}</small>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="deletePassword('${name}', ${index})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </li>`;
+          });
+
+          html += `</ul></div>`;
+        }
+
+        container.innerHTML = html;
+      }
+
+      function deletePassword(name, index) {
+        const savedPasswords =
+          JSON.parse(localStorage.getItem("savedPasswords")) || {};
+
+        if (!savedPasswords[name]) return;
+
+        // Remove the specific password
+        savedPasswords[name].splice(index, 1);
+
+        // Remove the name key if list becomes empty
+        if (savedPasswords[name].length === 0) {
+          delete savedPasswords[name];
+        }
+
+        // Save updated data
+        localStorage.setItem("savedPasswords", JSON.stringify(savedPasswords));
+
+        // Re-render modal
+        renderSavedPasswords();
+      }
+
+      function deleteAllPasswords() {
+        if (confirm("Are you sure you want to delete all saved passwords?")) {
+          localStorage.removeItem("savedPasswords");
+          renderSavedPasswords();
+          alert("All saved passwords deleted.");
+        }
+      }
+
+      function exportPasswords() {
+        const savedPasswords = localStorage.getItem("savedPasswords");
+
+        if (!savedPasswords) {
+          alert("No saved passwords to export.");
+          return;
+        }
+
+        const blob = new Blob([savedPasswords], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "saved-passwords.json";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+      }
+
+      function savePasswordTxt(index = 0) {
+        const passwordInput =
+          document.getElementsByClassName("copy-content")[index];
+        if (!passwordInput || !passwordInput.value) {
+          alert("No password to save!");
+          return;
+        }
+
+        const password = passwordInput.value;
+        const blob = new Blob([password], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "password.txt";
+        link.click();
+
+        // Clean up the URL object
+        URL.revokeObjectURL(url);
+      }
+    </script>
+
+    <!-- ======= Theme ======= -->
+    <loki-theme
+      class="btn-loki position-fixed bottom-0 end-0 mb-3 me-3 rounded-2"
+    ></loki-theme>
+
+    <!-- ======= Footer ======= -->
+    <!-- <loki-footer class="mt-auto loki-fill-ter"></loki-footer> -->
+
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="../assets/js/loki.js"></script>
+  </body>
+</html>

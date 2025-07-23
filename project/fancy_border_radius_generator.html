@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  data-loki-theme="auto"
+  data-loki-theme-color="green"
+  class="h-100"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Fancy Border Radius Generator</title>
+
+    <!-- Vendor CSS Files -->
+    <link
+      href="../assets/vendor/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="../assets/vendor/bootstrap-icons/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Template Main CSS File -->
+    <link href="../assets/css/loki.css" rel="stylesheet" />
+    <script>
+      document.documentElement.setAttribute(
+        "data-loki-theme-color",
+        localStorage.getItem("data-loki-theme-color")
+      );
+      document.documentElement.setAttribute(
+        "data-loki-theme",
+        localStorage.getItem("theme")
+      );
+      document.documentElement.setAttribute(
+        "data-bs-theme",
+        localStorage.getItem("theme")
+      );
+    </script>
+    <style>
+      .generator {
+        width: 60vmin;
+        height: 60vmin;
+        border: 2px dashed var(--loki-tertiary-color);
+        position: relative;
+        margin: auto;
+      }
+
+      @media screen and (min-width: 31.875rem) {
+        .generator {
+          width: 50vmin;
+          height: 50vmin;
+        }
+      }
+
+      .generator__shape {
+        width: 100%;
+        height: 100%;
+        background: var(--loki-theme-color);
+        border-radius: 30% 70% 70% 30%/30% 30% 70% 70%;
+        box-shadow: var(--loki-box-shadow);
+      }
+
+      .generator__handle {
+        display: block;
+        position: absolute;
+        cursor: pointer;
+        width: 2.5rem;
+        height: 2.5rem;
+      }
+
+      .generator__handle:before {
+        content: "";
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        left: 0.75rem;
+        top: 0.75rem;
+        background: var(--loki-text-color);
+        border: 2px solid var(--loki-background-color);
+        transition: box-shadow 0.2s ease-out;
+        border-radius: 50px;
+        will-change: box-shadow;
+      }
+
+      .generator__handle.active:before {
+        background: var(--loki-tertiary-color);
+        box-shadow: 0 0 0 4px var(--loki-text-color);
+        border: 2px solid var(--loki-theme-color);
+      }
+
+      .generator #top {
+        top: -1.25rem;
+        left: 30%;
+        transform: translate(-50%);
+      }
+
+      .generator #bottom {
+        bottom: -1.25rem;
+        left: 30%;
+        transform: translate(-50%);
+      }
+
+      .generator #left {
+        left: -1.25rem;
+        top: 30%;
+        transform: translateY(-50%);
+      }
+
+      .generator #right {
+        right: -1.25rem;
+        top: 30%;
+        transform: translateY(-50%);
+      }
+    </style>
+  </head>
+
+  <body class="d-flex flex-column h-100">
+    <div class="card border-loki m-auto">
+      <div class="card-header border-loki">
+        <h4 class="card-title text-center mt-1">
+          Fancy Border Radius Generator
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="generator" id="box">
+          <div class="generator__shape" id="shape"></div>
+          <span class="generator__handle" id="left"></span>
+          <span class="generator__handle" id="top"></span>
+          <span class="generator__handle" id="right"></span>
+          <span class="generator__handle" id="bottom"></span>
+        </div>
+     
+        <ul class="list-group list-group-flush mt-2">
+          <li class="list-group-item">
+            <div class="container-inside copy-hint">
+          <input
+            type="text"
+            class="inside-content copy-content counts-input p-1"
+            id="code"
+            style="font-size: 0.8rem; padding: 0.25rem 0.5rem"
+            disabled
+            placeholder="Genrate your passkey"
+            onkeyup="counts()"
+          />
+          <i class="bi bi-copy inside-btn d-flex" onclick="copyDataURI()"></i>
+        </div>
+          </li>
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center"
+          >
+            <label for="colorPicker">Choose Color:</label>
+            <input
+              type="color"
+              id="colorPicker"
+              class="form-control form-control-color d-inline-block"
+              title="Choose shape color"
+              style="width: 3rem; height: 2rem; padding: 0"
+            />
+          </li>
+          <li class="list-group-item d-flex justify-content-center">
+            <button class="btn btn-loki" id="randomBtn">
+              Random Border Radius
+            </button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-footer text-center border-loki">
+        <small class="text-muted">Designed By Lokesh</small>
+      </div>
+    </div>
+
+    <script>
+      function clamp(val, min, max) {
+        return Math.min(max, Math.max(min, val));
+      }
+
+      function setBorderRadius(state, shapeElem, codeElem) {
+        const { top, bottom, left, right } = state;
+        const borderRadius = `${top}% ${100 - top}% ${
+          100 - bottom
+        }% ${bottom}% / ${left}% ${right}% ${100 - right}% ${100 - left}%`;
+        shapeElem.style.borderRadius = borderRadius;
+        codeElem.value = borderRadius;
+      }
+
+      function createHandle(
+        handleElem,
+        axis,
+        stateKey,
+        state,
+        shapeElem,
+        codeElem
+      ) {
+        let current = null;
+
+        function dragStart(e) {
+          e.preventDefault();
+          current = e.target;
+          current.classList.add("active");
+
+          document.addEventListener("mousemove", dragging);
+          document.addEventListener("mouseup", dragEnd);
+          document.addEventListener("touchmove", dragging);
+          document.addEventListener("touchend", dragEnd);
+        }
+
+        function dragging(e) {
+          const rect = handleElem.parentNode.getBoundingClientRect();
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+          let percent;
+          if (axis === "x") {
+            percent = clamp(
+              (((clientX - 5 - rect.left) * 100) / rect.width).toFixed(0),
+              0,
+              100
+            );
+            handleElem.style.left = percent + "%";
+          } else {
+            percent = clamp(
+              (((clientY - 5 - rect.top) * 100) / rect.height).toFixed(0),
+              0,
+              100
+            );
+            handleElem.style.top = percent + "%";
+          }
+
+          state[stateKey] = percent;
+          setBorderRadius(state, shapeElem, codeElem);
+        }
+
+        function dragEnd() {
+          if (current) current.classList.remove("active");
+          document.removeEventListener("mousemove", dragging);
+          document.removeEventListener("mouseup", dragEnd);
+          document.removeEventListener("touchmove", dragging);
+          document.removeEventListener("touchend", dragEnd);
+        }
+
+        handleElem.addEventListener("mousedown", dragStart);
+        handleElem.addEventListener("touchstart", dragStart);
+      }
+
+      // Initialize when page loads
+      document.addEventListener("DOMContentLoaded", () => {
+        const shapeElem = document.getElementById("shape");
+        const codeElem = document.getElementById("code");
+
+        const state = {
+          left: 30,
+          right: 30,
+          top: 30,
+          bottom: 30,
+        };
+
+        setBorderRadius(state, shapeElem, codeElem);
+
+        createHandle(
+          document.getElementById("left"),
+          "y",
+          "left",
+          state,
+          shapeElem,
+          codeElem
+        );
+        createHandle(
+          document.getElementById("right"),
+          "y",
+          "right",
+          state,
+          shapeElem,
+          codeElem
+        );
+        createHandle(
+          document.getElementById("top"),
+          "x",
+          "top",
+          state,
+          shapeElem,
+          codeElem
+        );
+        createHandle(
+          document.getElementById("bottom"),
+          "x",
+          "bottom",
+          state,
+          shapeElem,
+          codeElem
+        );
+
+        // Moved inside DOMContentLoaded
+        document.getElementById("randomBtn").addEventListener("click", () => {
+          const randomPercent = () => Math.floor(Math.random() * 101); // 0 to 100
+
+          state.top = randomPercent();
+          state.bottom = randomPercent();
+          state.left = randomPercent();
+          state.right = randomPercent();
+
+          setBorderRadius(state, shapeElem, codeElem);
+
+          document.getElementById("top").style.left = state.top + "%";
+          document.getElementById("bottom").style.left = state.bottom + "%";
+          document.getElementById("left").style.top = state.left + "%";
+          document.getElementById("right").style.top = state.right + "%";
+        });
+
+        // 👉 Color change handler
+        document
+          .getElementById("colorPicker")
+          .addEventListener("input", (e) => {
+            shapeElem.style.backgroundColor = e.target.value;
+          });
+      });
+
+      document.getElementById("randomBtn").addEventListener("click", () => {
+        const randomPercent = () => Math.floor(Math.random() * 101); // 0 to 100
+
+        state.top = randomPercent();
+        state.bottom = randomPercent();
+        state.left = randomPercent();
+        state.right = randomPercent();
+
+        setBorderRadius(state, shapeElem, codeElem);
+
+        // Also move the handles visually
+        document.getElementById("top").style.left = state.top + "%";
+        document.getElementById("bottom").style.left = state.bottom + "%";
+        document.getElementById("left").style.top = state.left + "%";
+        document.getElementById("right").style.top = state.right + "%";
+      });
+
+      const colorPicker = document.getElementById("colorPicker");
+
+      // Save new color
+      colorPicker.addEventListener("input", (e) => {
+        const newColor = e.target.value;
+        shapeElem.style.backgroundColor = newColor;
+        localStorage.setItem("shapeColor", newColor);
+      });
+
+      window.addEventListener("DOMContentLoaded", () => {
+        const colorPicker = document.getElementById("colorPicker");
+
+        // Get color value from localStorage
+        const storedColor = getComputedStyle(document.documentElement)
+          .getPropertyValue("--loki-theme-color")
+          .trim();
+
+        if (storedColor) {
+          // Set the input's color value
+          colorPicker.value = storedColor;
+        }
+      });
+    </script>
+
+    <!-- ======= Theme ======= -->
+    <loki-theme
+      class="btn-loki position-fixed bottom-0 end-0 mb-3 me-3 rounded-2"
+    ></loki-theme>
+
+    <!-- ======= Footer ======= -->
+    <!-- <loki-footer class="mt-auto loki-fill-ter"></loki-footer> -->
+
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="../assets/js/loki.js"></script>
+  </body>
+</html>
