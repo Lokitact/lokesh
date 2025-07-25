@@ -32,7 +32,7 @@ formElement.addEventListener("submit", function (e) {
     "https://script.google.com/macros/s/AKfycbz05twyz7bVlq3aBXRLUFqdfDY-Xqgp9pTJ_Z5mMqvCBRwb4C2HefLJfO9wJi9UAq8WgA/exec",
     {
       method: "POST",
-      //  mode: 'no-cors',//local
+      mode: 'no-cors',//local
       body: new URLSearchParams(form),
     }
   )
