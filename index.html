@@ -54,7 +54,7 @@
       rel="stylesheet"
     />
 
-    <!-- Template Main CSS File -->
+    <!-- Main CSS File -->
     <link href="./assets/css/style.css" rel="stylesheet" />
     <link href="./assets/css/loki.css" rel="stylesheet" />
 
@@ -803,11 +803,50 @@
     <!-- ======= Footer ======= -->
     <loki-footer></loki-footer>
 
-    <a
-      href="#"
-      class="back-to-top d-flex align-items-center justify-content-center"
-      ><i class="bi bi-arrow-up-short"></i
-    ></a>
+    <!-- Chatbot Button -->
+    <div class="bottom-container">
+      <div
+        class="bottom-content"
+        data-bs-toggle="collapse"
+        data-bs-target="#chat-bot"
+        aria-expanded="false"
+        aria-controls="chat-bot"
+      >
+        <i class="bi bi-robot"></i>
+      </div>
+      <a href="#" class="bottom-content"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <div class="card border-loki chat-bot collapse" id="chat-bot">
+      <div class="card-header border-loki d-flex justify-content-between">
+        <strong class="text-muted">Chat Bot</strong>
+        <button
+          type="button"
+          class="btn-close"
+          aria-label="Close"
+          data-bs-toggle="collapse"
+          data-bs-target="#chat-bot"
+        ></button>
+      </div>
+      <div
+        class="card-body d-flex flex-column overflow-auto"
+        id="chatbot-messages"
+      ></div>
+      <div class="card-footer border-loki">
+        <form id="chatbot-form">
+          <div class="d-flex justify-content-between gap-1">
+            <input
+              type="text"
+              class="px-1"
+              id="chatbot-input"
+              placeholder="Type a message..."
+              required
+            />
+            <button type="submit" class="btn btn-outline-loki">Send</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Vendor JS Files -->
     <script src="./assets/vendor/purecounter/purecounter.js"></script>
@@ -819,10 +858,12 @@
     <script src="./assets/vendor/typed-js/typed.min.js"></script>
     <script src="./assets/vendor/waypoints/noframework.waypoints.js"></script>
 
-    <!-- Template Main JS File -->
+    <!-- Main JS File -->
     <script src="./assets/js/main.js"></script>
-    <script src="./assets/js/loki.js"></script>
-
+    <script type="module" src="./assets/js/loki.js"></script>
+    <!-- Contact form JS File -->
     <script src="./assets/form/contact.js"></script>
+    <!-- Loki Bot form JS File -->
+    <script type="module" src="./assets/form/loki-bot.js"></script>
   </body>
 </html>

@@ -1,0 +1,63 @@
+{
+  "basic_info": {
+    "name": "LOKESH",
+    "title": "I'm Developer",
+    "subtitle": "UI/UX Designer & Web Developer",
+    "profile_image": "profile.jpg", 
+    "freelance": "Available",
+    "website": "https://lokitact.github.io/lokesh/",
+    "email": "lokesh.v3137@gmail.com",
+    "phone": "+91 6382673587",
+    "languages": ["Tamil", "English"],
+    "blood_group": "B+",
+    "gender": "Male",
+    "dob": "1997-07-27",
+    "degree": "B.COM(C.A)"
+  },
+  "about": {
+    "short": "I am a person who likes new things, challenges, art and targets for a goal.",
+    "long": "With the results of learning and practice that have been traversed in earnest, the results will be maximized. Maybe a lot of people are more than good than me, but with perseverance and strong will, one can defeat all.",
+    "profile": "I am a keen, hard working, reliable and excellent time keeper. I am a bright and receptive person, able to communicate well with people at all levels. I am good at working using my own initiative and I am flexible in my approach to work duties. I have a good sense of humour and a pleasant approach."
+  },
+  "skills": [
+    { "name": "E-PUB", "proficiency": "90%" },
+    { "name": "HTML5", "proficiency": "95%" },
+    { "name": "CSS", "proficiency": "55%" },
+    { "name": "MS Office", "proficiency": "70%" },
+    { "name": "Tally", "proficiency": "65%" },
+    { "name": "Photoshop", "proficiency": "45%" }
+  ],
+  "resume": {
+    "summary": "E-PUB Designer with 1 year of experience designing and developing epub documents from initial PDF to perfect EPUB2 & EPUB3 format.",
+    "location": "Namakkal",
+    "contact_email": "medleosolutions@gmail.com"
+  },
+  "education": {
+    "degree": "Bachelor of Commerce with Computer Applications",
+    "year": "2015 - 2018",
+    "institute": "Selvamm Arts & Science College, Namakkal"
+  },
+  "experience": {
+    "title": "E-PUB Designing",
+    "period": "Mar 2021 - May 2022",
+    "duration": "1 year 3 months",
+    "company": "Medleo Solutions, Namakkal",
+    "description": [
+      "Lead in the design, development of the E-PUB2 & E-PUB3.",
+      "Worked on Accessibility PDF making, Fixed layout designing, and XML file handling."
+    ]
+  },
+  "contact": {
+    "call_time": "7AM to 9PM",
+    "phone": "6382673587",
+    "email": "lokesh.v3137@gmail.com",
+    "address": {
+      "line1": "S/O: Veeraiya",
+      "line2": "3/156, SAVADI EAST STREET",
+      "line3": "KOOLIPATTI, Reddipatti(P.O)",
+      "district": "Namakkal(D.T)",
+      "pincode": "637002"
+    },
+    "social_media": []
+  }
+}

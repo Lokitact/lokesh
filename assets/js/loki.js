@@ -1,11 +1,14 @@
-(() => {
-  "use strict";
-  const [date, month, year] = new Date().toLocaleDateString("en-In").split("/");
-  const hours = new Date().getHours();
+import { calculateAge } from "./ageCalculator.js";
 
-  /**  * author  */
-  let wish = (hours >= 0 && hours < 12) ? 'Morning' : (hours >= 12 && hours < 16) ? 'Afternoon' : 'Evening';
-  console.log('Hi Good ' + wish + '\u000AWelcome to our website by \u000AAuthor \u0026 Designer\u003A Lokesh');
+(async () => {
+  "use strict";
+  let lokeshData = null;
+  async function loadLokeshData() {
+    if (!lokeshData) {
+      const response = await fetch("assets/data/loki.json");
+      lokeshData = await response.json();
+    }
+  }
 
   /**  * Custom theme */
   class MyTheme extends HTMLElement {
@@ -40,15 +43,18 @@
             <div class="warning" data-loki-theme-color-value="warning" aria-pressed="false"></div>
           </li>
         </ul>`;
-      if (document.getElementsByTagName('loki-theme')[0].getAttribute('data-theme-li')) {
+      if (
+        document
+          .getElementsByTagName("loki-theme")[0]
+          .getAttribute("data-theme-li")
+      ) {
         this.innerHTML = `<li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="bd-theme" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
               <i class="bi bi-palette-fill"></i><span id="theme-hint"></span>
             </a>
             ${themeUl}
           </li>`;
-      }
-      else {
+      } else {
         this.innerHTML = `<div class="dropdown">
             <button class="btn btn-loki py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button" aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (auto)">
             <i class="bi bi-palette-fill" id="theme-icon-active"></i><span id="theme-hint"></span>
@@ -59,125 +65,168 @@
     }
   }
 
-  customElements.define('loki-theme', MyTheme);
+  customElements.define("loki-theme", MyTheme);
   // custom theme end
 
-  if (document.getElementsByTagName('loki-theme')[0]) {
-    if (document.getElementsByTagName('loki-theme')[0].getAttribute('data-theme-hint'))
-      document.getElementById("theme-hint").innerHTML = document.getElementsByTagName('loki-theme')[0].getAttribute('data-theme-hint');
+  if (document.getElementsByTagName("loki-theme")[0]) {
+    if (
+      document
+        .getElementsByTagName("loki-theme")[0]
+        .getAttribute("data-theme-hint")
+    )
+      document.getElementById("theme-hint").innerHTML = document
+        .getElementsByTagName("loki-theme")[0]
+        .getAttribute("data-theme-hint");
 
-    document.documentElement.setAttribute("data-loki-theme-color", localStorage.getItem("data-loki-theme-color"));
-    document.documentElement.setAttribute("data-loki-theme", localStorage.getItem("theme"));
-    document.documentElement.setAttribute("data-bs-theme", localStorage.getItem("theme"));
-    const getStoredTheme = () => localStorage.getItem('theme')
-    const setStoredTheme = theme => localStorage.setItem('theme', theme)
+    document.documentElement.setAttribute(
+      "data-loki-theme-color",
+      localStorage.getItem("data-loki-theme-color")
+    );
+    document.documentElement.setAttribute(
+      "data-loki-theme",
+      localStorage.getItem("theme")
+    );
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      localStorage.getItem("theme")
+    );
+    const getStoredTheme = () => localStorage.getItem("theme");
+    const setStoredTheme = (theme) => localStorage.setItem("theme", theme);
 
     const getPreferredTheme = () => {
-      const storedTheme = getStoredTheme()
+      const storedTheme = getStoredTheme();
       if (storedTheme) {
-        return storedTheme
+        return storedTheme;
       }
-      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-    }
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    };
 
-    const setTheme = theme => {
-      if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-loki-theme', 'dark')
-        document.documentElement.setAttribute('data-bs-theme', 'dark')
+    const setTheme = (theme) => {
+      if (
+        theme === "auto" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        document.documentElement.setAttribute("data-loki-theme", "dark");
+        document.documentElement.setAttribute("data-bs-theme", "dark");
       } else {
-        document.documentElement.setAttribute('data-loki-theme', theme)
-        document.documentElement.setAttribute('data-bs-theme', theme)
+        document.documentElement.setAttribute("data-loki-theme", theme);
+        document.documentElement.setAttribute("data-bs-theme", theme);
       }
-    }
+    };
 
-    setTheme(getPreferredTheme())
+    setTheme(getPreferredTheme());
 
     const showActiveTheme = (theme, focus = false) => {
+      const activeThemeIcon = document.querySelector("#bd-theme i");
 
-      const activeThemeIcon = document.querySelector('#bd-theme i')
+      const btnToActive = document.querySelector(
+        `[data-loki-theme-value="${theme}"]`
+      );
+      const iconOfActiveBtn = btnToActive
+        .querySelector("i")
+        .getAttribute("class");
 
-      const btnToActive = document.querySelector(`[data-loki-theme-value="${theme}"]`)
-      const iconOfActiveBtn = btnToActive.querySelector('i').getAttribute('class')
+      document
+        .querySelectorAll("[data-loki-theme-value]")
+        .forEach((element) => {
+          element.classList.remove("active");
+          element.setAttribute("aria-pressed", "false");
+        });
 
-      document.querySelectorAll('[data-loki-theme-value]').forEach(element => {
-        element.classList.remove('active')
-        element.setAttribute('aria-pressed', 'false')
-      })
+      btnToActive.classList.add("active");
+      btnToActive.setAttribute("aria-pressed", "true");
+      if (
+        !document
+          .getElementsByTagName("loki-theme")[0]
+          .getAttribute("data-theme-li")
+      )
+        activeThemeIcon.setAttribute("class", iconOfActiveBtn);
+    };
 
-      btnToActive.classList.add('active')
-      btnToActive.setAttribute('aria-pressed', 'true')
-      if (!document.getElementsByTagName('loki-theme')[0].getAttribute('data-theme-li'))
-        activeThemeIcon.setAttribute('class', iconOfActiveBtn)
-    }
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", () => {
+        const storedTheme = getStoredTheme();
+        if (storedTheme !== "light" && storedTheme !== "dark") {
+          setTheme(getPreferredTheme());
+        }
+      });
 
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      const storedTheme = getStoredTheme()
-      if (storedTheme !== 'light' && storedTheme !== 'dark') {
-        setTheme(getPreferredTheme())
-      }
-    })
+    window.addEventListener("DOMContentLoaded", () => {
+      showActiveTheme(getPreferredTheme());
 
-    window.addEventListener('DOMContentLoaded', () => {
-      showActiveTheme(getPreferredTheme())
-
-      document.querySelectorAll('[data-loki-theme-value]')
-        .forEach(toggle => {
-          toggle.addEventListener('click', () => {
-            const theme = toggle.getAttribute('data-loki-theme-value')
-            setStoredTheme(theme)
-            setTheme(theme)
-            showActiveTheme(theme, true)
-          })
-        })
-    })
+      document.querySelectorAll("[data-loki-theme-value]").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          const theme = toggle.getAttribute("data-loki-theme-value");
+          setStoredTheme(theme);
+          setTheme(theme);
+          showActiveTheme(theme, true);
+        });
+      });
+    });
 
     /**  * theme color  */
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener("DOMContentLoaded", () => {
       const currentThemecolor = localStorage.getItem("data-loki-theme-color");
       const setActiveThemeColor = (currentThemecolor, focus = false) => {
-        document.querySelectorAll('[data-loki-theme-color-value]').forEach(element => {
-          element.classList.remove('active')
-          element.setAttribute('aria-pressed', 'false')
-        })
+        document
+          .querySelectorAll("[data-loki-theme-color-value]")
+          .forEach((element) => {
+            element.classList.remove("active");
+            element.setAttribute("aria-pressed", "false");
+          });
 
-        const themeColorActive = document.querySelector(`[data-loki-theme-color-value="${currentThemecolor}"]`)
-        themeColorActive.classList.add('active')
-        themeColorActive.setAttribute('aria-pressed', 'true')
-      }
+        const themeColorActive = document.querySelector(
+          `[data-loki-theme-color-value="${currentThemecolor}"]`
+        );
+        themeColorActive.classList.add("active");
+        themeColorActive.setAttribute("aria-pressed", "true");
+      };
       let themesName = [];
-      for (var value of document.querySelectorAll('[data-loki-theme-color-value]')) {
-        themesName.push(value.getAttribute('data-loki-theme-color-value'))
+      for (var value of document.querySelectorAll(
+        "[data-loki-theme-color-value]"
+      )) {
+        themesName.push(value.getAttribute("data-loki-theme-color-value"));
       }
-      let themeClassName = ['alert', 'btn', 'btn-outline', 'border'];
+      let themeClassName = ["alert", "btn", "btn-outline", "border"];
       const themeLoki = (setThemeColor, focus = false) => {
         for (var tclassName of themeClassName) {
-          document.querySelectorAll(`.${tclassName}-loki`).forEach(alertLoki => {
-            themesName.forEach((themesName) => {
-              if (alertLoki.classList.contains(`${tclassName}-${themesName}`))
-                alertLoki.classList.remove(`${tclassName}-${themesName}`);
+          document
+            .querySelectorAll(`.${tclassName}-loki`)
+            .forEach((alertLoki) => {
+              themesName.forEach((themesName) => {
+                if (alertLoki.classList.contains(`${tclassName}-${themesName}`))
+                  alertLoki.classList.remove(`${tclassName}-${themesName}`);
+              });
+              alertLoki.classList.add(`${tclassName}-${setThemeColor}`);
             });
-            alertLoki.classList.add(`${tclassName}-${setThemeColor}`);
-          })
         }
-      }
-      document.querySelectorAll('[data-loki-theme-color-value]')
-        .forEach(toggle => {
-          toggle.addEventListener('click', () => {
-            const currentThemecolor = toggle.getAttribute('data-loki-theme-color-value');
-            document.documentElement.setAttribute("data-loki-theme-color", currentThemecolor);
+      };
+      document
+        .querySelectorAll("[data-loki-theme-color-value]")
+        .forEach((toggle) => {
+          toggle.addEventListener("click", () => {
+            const currentThemecolor = toggle.getAttribute(
+              "data-loki-theme-color-value"
+            );
+            document.documentElement.setAttribute(
+              "data-loki-theme-color",
+              currentThemecolor
+            );
             localStorage.setItem("data-loki-theme-color", currentThemecolor);
             setActiveThemeColor(currentThemecolor, true);
             themeLoki(currentThemecolor, true);
-
-          })
-        })
+          });
+        });
       if (localStorage.getItem("data-loki-theme-color") !== null) {
         setActiveThemeColor(currentThemecolor, true);
         themeLoki(currentThemecolor, true);
       } else {
-        themeLoki('success', true);
+        themeLoki("success", true);
       }
-    })
+    });
   }
 
   //  theme end
@@ -185,10 +234,12 @@
   /**  * age counted  */
   class MyAge extends HTMLElement {
     connectedCallback() {
-      this.innerHTML = ((month <= 5 || (month == 6 & date < 27)) ? year - '1998' : year - '1997') + ' years';
+      this.innerHTML = `${calculateAge(lokeshData.basic_info.dob)} Years`;
     }
   }
-  customElements.define('loki-age', MyAge);
+
+  await loadLokeshData();
+  customElements.define("loki-age", MyAge);
   //  age end
 
   /**  * Custom waves */
@@ -206,10 +257,10 @@
   class MyWaves extends HTMLElement {
     connectedCallback() {
       this.innerHTML = wavesCode;
-      this.style.fill = 'var(--loki-theme-color)';
+      this.style.fill = "var(--loki-theme-color)";
     }
   }
-  customElements.define('loki-waves', MyWaves);
+  customElements.define("loki-waves", MyWaves);
 
   // custom waves end
 
@@ -223,20 +274,24 @@
       </div>
       </footer>`;
       this.style.fontFamily = "cursive";
-      this.style.fill = 'var(--bs-secondary-bg)';
+      this.style.fill = "var(--bs-secondary-bg)";
     }
   }
-  customElements.define('loki-footer', MyFooter);
+  customElements.define("loki-footer", MyFooter);
   // custom footer end
 })();
 
 let contentPlace = 0;
 /**  * count text for visible  */
 function counts() {
-  if (document.getElementsByClassName("inside-content")[contentPlace].value === "") {
-    document.getElementsByClassName("inside-btn")[contentPlace].style.display = 'none';
+  if (
+    document.getElementsByClassName("inside-content")[contentPlace].value === ""
+  ) {
+    document.getElementsByClassName("inside-btn")[contentPlace].style.display =
+      "none";
   } else {
-    document.getElementsByClassName("inside-btn")[contentPlace].style.display = 'flex';
+    document.getElementsByClassName("inside-btn")[contentPlace].style.display =
+      "flex";
   }
 }
 
@@ -246,18 +301,21 @@ function copyDataURI(index = 0) {
   const hintContainer = document.getElementsByClassName("copy-hint")[index];
 
   if (copyContent && copyContent.value) {
-    navigator.clipboard.writeText(copyContent.value).then(() => {
-      if (hintContainer) {
-        notifyBox(hintContainer, "COPIED");
-      }
-    }).catch((err) => {
-      console.error("Copy failed:", err);
-    });
+    navigator.clipboard
+      .writeText(copyContent.value)
+      .then(() => {
+        if (hintContainer) {
+          notifyBox(hintContainer, "COPIED");
+        }
+      })
+      .catch((err) => {
+        console.error("Copy failed:", err);
+      });
   }
 }
 
 function notifyBox(container, msg) {
-  const nBOX = document.createElement('div');
+  const nBOX = document.createElement("div");
   nBOX.classList.add("notifyBox");
   nBOX.textContent = msg;
 
