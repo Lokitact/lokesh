@@ -117,6 +117,7 @@ If a user asks about anything other than Lokesh, respond with:
 
     const res = await fetch("https://script.google.com/macros/s/AKfycbxfQLNOsOg7aRIBDz9FZmuDKbvQNqWJRBSfG6bdlZ7IYWQDqjBG2HyWG1cg-oHSCPxaaA/exec", {
       method: "POST",
+      mode: 'no-cors',
       headers: {
         "Content-Type": "application/json",
       },
