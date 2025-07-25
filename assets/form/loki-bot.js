@@ -1,5 +1,35 @@
 import { calculateAge } from "../js/ageCalculator.js";
 
+
+/** Check OpenRouter Credit Availability */
+async function checkOpenRouterCredits() {
+  try {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer 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",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "deepseek/deepseek-r1:free",
+        messages: [
+          { role: "system", content: "You are checking credits." },
+          { role: "user", content: "Say OK if available." }
+        ]
+      }),
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    const reply = data?.choices?.[0]?.message?.content?.toLowerCase() || "";
+    return reply.includes("ok");
+  } catch (e) {
+    console.error("Credit check failed:", e);
+    return false;
+  }
+}
+
 /**  * Chatbot  */
 const form = document.getElementById("chatbot-form");
 const input = document.getElementById("chatbot-input");
@@ -19,13 +49,25 @@ async function loadLokeshData() {
   }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const hasCredits = await checkOpenRouterCredits();
+
+  if (!hasCredits) {
+    messages.innerHTML += `<div class="chat-bubble">
+      <div class="message bot-message text-danger">⚠️ Sorry, no API credits available. Loki is currently offline.</div>
+    </div>`;
+    sendBtn.disabled = true;
+    input.disabled = true;
+    return;
+  }
+
   if (messages.children.length === 0) {
     messages.innerHTML += `<div class="chat-bubble">
       <div class="message bot-message">👋 Hello Lokesh! I'm <strong>Loki</strong>, your assistant. How can I help you regarding your profile?</div>
     </div>`;
   }
 });
+
 
 function parseMarkdownBold(text) {
   return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
@@ -41,13 +83,11 @@ form.onsubmit = async (e) => {
         </div>`;
 
   messages.scrollTop = messages.scrollHeight;
-
   input.value = "";
+  sendBtn.disabled = true; // Disable until next input
+
   try {
     await loadLokeshData();
-    // content: "You are a helpful assistant named JP.",
-    // content:"You are a helpful assistant. The user’s name is Alex. Always address the user as Alex.",
-
     const systemPrompt = `
 You are a helpful assistant named **Loki**. You must always refer to yourself as Loki.
 
@@ -77,7 +117,7 @@ If a user asks about anything other than Lokesh, respond with:
       method: "POST",
       headers: {
         Authorization:
-          "Bearer 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",
+          "Bearer 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",
         "HTTP-Referer": "https://lokitact.github.io/lokesh/", // Optional. Site URL for rankings on openrouter.ai.
         "X-Title": "LOKI Website Assistant", // Optional. Site title for rankings on openrouter.ai.
         "Content-Type": "application/json",
@@ -96,9 +136,11 @@ If a user asks about anything other than Lokesh, respond with:
         ],
       }),
     });
+
     const data = await res.json();
     let msgrep =
-      data.choices[0].message.content || "Sorry, I didn't understand that.";
+      data.choices?.[0]?.message?.content ||
+      "❗ Sorry, I didn't get a valid response.";
     msgrep = parseMarkdownBold(msgrep);
     messages.innerHTML += `<div class="chat-bubble">
           <div class="message bot-message">${msgrep}
@@ -106,6 +148,9 @@ If a user asks about anything other than Lokesh, respond with:
         </div>`;
   } catch (error) {
     console.error("Error sending message:", error);
+    messages.innerHTML += `<div class="chat-bubble">
+      <div class="message bot-message text-danger">🚨 Error: Unable to respond at the moment.</div>
+    </div>`;
   }
 
   messages.scrollTop = messages.scrollHeight;
