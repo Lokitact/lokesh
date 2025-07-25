@@ -126,7 +126,7 @@ If a user asks about anything other than Lokesh, respond with:
         messages: [
           {
             role: "system",
-           // content: systemPrompt,
+            content: systemPrompt,
           },
           {
             role: "user",
@@ -140,7 +140,7 @@ If a user asks about anything other than Lokesh, respond with:
     let msgrep =
       data.choices?.[0]?.message?.content ||
       "❗ Sorry, I didn't get a valid response.";
-   // msgrep = parseMarkdownBold(msgrep);
+    msgrep = parseMarkdownBold(msgrep);
     messages.innerHTML += `<div class="chat-bubble">
           <div class="message bot-message">${msgrep}
           </div>
