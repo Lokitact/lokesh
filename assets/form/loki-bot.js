@@ -115,13 +115,9 @@ If a user asks about anything other than Lokesh, respond with:
 "I'm Loki, your assistant. I'm here only to help with questions about Lokesh."
 `.trim();
 
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxfQLNOsOg7aRIBDz9FZmuDKbvQNqWJRBSfG6bdlZ7IYWQDqjBG2HyWG1cg-oHSCPxaaA/exec", {
       method: "POST",
       headers: {
-        Authorization:
-          "Bearer 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",
-        "HTTP-Referer": "https://lokitact.github.io/lokesh/", // Optional. Site URL for rankings on openrouter.ai.
-        "X-Title": "LOKI Website Assistant", // Optional. Site title for rankings on openrouter.ai.
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
