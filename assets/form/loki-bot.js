@@ -126,7 +126,7 @@ If a user asks about anything other than Lokesh, respond with:
         messages: [
           {
             role: "system",
-            content: systemPrompt,
+           // content: systemPrompt,
           },
           {
             role: "user",
