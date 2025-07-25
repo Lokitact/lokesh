@@ -1,23 +1,26 @@
 import { calculateAge } from "../js/ageCalculator.js";
 
-
 /** Check OpenRouter Credit Availability */
-async function checkOpenRouterCredits() {
+/*async function checkOpenRouterCredits() {
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer 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",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1:free",
-        messages: [
-          { role: "system", content: "You are checking credits." },
-          { role: "user", content: "Say OK if available." }
-        ]
-      }),
-    });
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization:
+            "Bearer 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",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "deepseek/deepseek-r1:free",
+          messages: [
+            { role: "system", content: "You are checking credits." },
+            { role: "user", content: "Say OK if available." },
+          ],
+        }),
+      }
+    );
 
     if (!response.ok) return false;
 
@@ -28,7 +31,7 @@ async function checkOpenRouterCredits() {
     console.error("Credit check failed:", e);
     return false;
   }
-}
+}*/
 
 /**  * Chatbot  */
 const form = document.getElementById("chatbot-form");
@@ -50,7 +53,7 @@ async function loadLokeshData() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const hasCredits = await checkOpenRouterCredits();
+  /* const hasCredits = await checkOpenRouterCredits();
 
   if (!hasCredits) {
     messages.innerHTML += `<div class="chat-bubble">
@@ -59,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     sendBtn.disabled = true;
     input.disabled = true;
     return;
-  }
+  }*/
 
   if (messages.children.length === 0) {
     messages.innerHTML += `<div class="chat-bubble">
@@ -67,7 +70,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     </div>`;
   }
 });
-
 
 function parseMarkdownBold(text) {
   return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
@@ -117,7 +119,7 @@ If a user asks about anything other than Lokesh, respond with:
       method: "POST",
       headers: {
         Authorization:
-          "Bearer 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",
+          "Bearer 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",
         "HTTP-Referer": "https://lokitact.github.io/lokesh/", // Optional. Site URL for rankings on openrouter.ai.
         "X-Title": "LOKI Website Assistant", // Optional. Site title for rankings on openrouter.ai.
         "Content-Type": "application/json",
@@ -151,6 +153,8 @@ If a user asks about anything other than Lokesh, respond with:
     messages.innerHTML += `<div class="chat-bubble">
       <div class="message bot-message text-danger">🚨 Error: Unable to respond at the moment.</div>
     </div>`;
+    sendBtn.disabled = true;
+    input.disabled = true;
   }
 
   messages.scrollTop = messages.scrollHeight;
