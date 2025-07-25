@@ -119,7 +119,7 @@ If a user asks about anything other than Lokesh, respond with:
       method: "POST",
       headers: {
         Authorization:
-          "Bearer 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",
+          "Bearer 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",
         "HTTP-Referer": "https://lokitact.github.io/lokesh/", // Optional. Site URL for rankings on openrouter.ai.
         "X-Title": "LOKI Website Assistant", // Optional. Site title for rankings on openrouter.ai.
         "Content-Type": "application/json",
