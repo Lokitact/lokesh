@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple Chatbot</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        max-width: 600px;
+        margin: auto;
+      }
+      #chatBox {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: auto;
+      }
+      .message {
+        margin: 5px 0;
+      }
+      .user {
+        color: blue;
+      }
+      .bot {
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>OpenRouter Chatbot</h2>
+    <div id="chatBox"></div>
+    <input
+      id="userInput"
+      type="text"
+      placeholder="Type a message..."
+      style="width: 80%"
+    />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+      const chatBox = document.getElementById("chatBox");
+      const userInput = document.getElementById("userInput");
+
+      const systemMessage = {
+        role: "system",
+        content: "You are a helpful assistant powered by DeepSeek.",
+      };
+
+      let messages = [systemMessage];
+
+      async function sendMessage() {
+  const userText = userInput.value.trim();
+  if (!userText) return;
+
+  messages.push({ role: "user", content: userText });
+  chatBox.innerHTML += `<div class="message user"><strong>You:</strong> ${userText}</div>`;
+  userInput.value = "";
+
+  const formData = new URLSearchParams();
+  formData.append("messages", JSON.stringify(messages));
+
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbyHu-Xl8SP323ObISZv0GSqk6xiN5cqCSK_xWkRvT9A66bHg8tw5aLjhVBbNCIB8yfLPw/exec",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      }
+    );
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "No response.";
+    messages.push({ role: "assistant", content: reply });
+
+    chatBox.innerHTML += `<div class="message bot"><strong>Bot:</strong> ${reply}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } catch (err) {
+    chatBox.innerHTML += `<div class="message bot"><strong>Error:</strong> ${err.message}</div>`;
+    console.error("Fetch failed:", err);
+  }
+}
+
+    </script>
+  </body>
+</html>
