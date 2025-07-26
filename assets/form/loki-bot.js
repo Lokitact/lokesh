@@ -53,7 +53,7 @@ async function loadLokeshData() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  /* const hasCredits = await checkOpenRouterCredits();
+ /* const hasCredits = await checkOpenRouterCredits();
 
   if (!hasCredits) {
     messages.innerHTML += `<div class="chat-bubble">
@@ -75,87 +75,4 @@ function parseMarkdownBold(text) {
   return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 }
 
-form.onsubmit = async (e) => {
-  e.preventDefault();
-  const userMsg = input.value.trim();
-  if (!userMsg) return;
 
-  messages.innerHTML += `<div class="chat-bubble">
-          <div class="message user-message">${userMsg}</div>
-        </div>`;
-
-  messages.scrollTop = messages.scrollHeight;
-  input.value = "";
-  sendBtn.disabled = true; // Disable until next input
-
-  try {
-    await loadLokeshData();
-    const systemPrompt = `
-You are a helpful assistant named **Loki**. You must always refer to yourself as Loki.
-
-You only answer queries related to the person named **Lokesh**, whose profile is below:
-
-Name: ${lokeshData.basic_info.name}
-Age: ${calculateAge(lokeshData.basic_info.dob)}
-Degree: ${lokeshData.basic_info.degree}
-Gender: ${lokeshData.basic_info.gender}
-Freelance: ${lokeshData.basic_info.freelance}
-Languages: ${lokeshData.basic_info.languages.join(", ")}
-Skills: ${lokeshData.skills
-      .map((s) => s.name + " - " + s.proficiency)
-      .join(", ")}
-Resume Summary: ${lokeshData.resume.summary}
-Experience: ${lokeshData.experience.title} at ${lokeshData.experience.company}
-Education: ${lokeshData.education.degree} from ${
-      lokeshData.education.institute
-    } (${lokeshData.education.year})
-Contact Email: ${lokeshData.basic_info.email}
-
-If a user asks about anything other than Lokesh, respond with:
-"I'm Loki, your assistant. I'm here only to help with questions about Lokesh."
-`.trim();
-
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization:
-          "Bearer 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",
-        "HTTP-Referer": "https://lokitact.github.io/lokesh/", // Optional. Site URL for rankings on openrouter.ai.
-        "X-Title": "LOKI Website Assistant", // Optional. Site title for rankings on openrouter.ai.
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "deepseek/deepseek-r1:free",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userMsg,
-          },
-        ],
-      }),
-    });
-
-    const data = await res.json();
-    let msgrep =
-      data.choices?.[0]?.message?.content ||
-      "❗ Sorry, I didn't get a valid response.";
-    msgrep = parseMarkdownBold(msgrep);
-    messages.innerHTML += `<div class="chat-bubble">
-          <div class="message bot-message">${msgrep}
-          </div>
-        </div>`;
-  } catch (error) {
-    console.error("Error sending message:", error);
-    messages.innerHTML += `<div class="chat-bubble">
-      <div class="message bot-message text-danger">🚨 Error: Unable to respond at the moment.</div>
-    </div>`;
-    sendBtn.disabled = true;
-    input.disabled = true;
-  }
-
-  messages.scrollTop = messages.scrollHeight;
-};
