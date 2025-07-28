@@ -17,6 +17,25 @@ import { calculateAge } from "../js/ageCalculator.js";
     return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
   }
 
+  function showLoader() {
+    const loader = document.createElement("div");
+    loader.className = "chat-bubble bot-loader";
+    loader.id = "loki-loader";
+    loader.innerHTML = `
+    <div class="message bot-message">
+      <span class="typing-dots">
+        <span>.</span><span>.</span><span>.</span>
+      </span>
+    </div>`;
+    document.getElementById("chatbot-messages").appendChild(loader);
+    loader.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function hideLoader() {
+    const loader = document.getElementById("loki-loader");
+    if (loader) loader.remove();
+  }
+
   // Show Message in UI
   function addMessage(content, sender = "user") {
     const msgDiv = document.createElement("div");
@@ -113,8 +132,10 @@ If a user asks about anything other than Lokesh, respond with:
     addMessage(userInput, "user");
     input.value = "";
     sendBtn.disabled = true;
+    showLoader(); // ✅ Show loader
 
     const reply = await sendToLoki(userInput);
+    hideLoader(); // ✅ Remove loader
     addMessage(reply, "bot");
   });
 })();
