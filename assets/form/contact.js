@@ -29,7 +29,7 @@ formElement.addEventListener("submit", function (e) {
   const form = new FormData(formElement);
 
   fetch(
-    "https://script.google.com/macros/s/AKfycbzGJwraosFO1vDTAb-6REW9WNnUKzXYo4PI3ToBFbr9_yJpLQTSUJ437N5zWg3u4JB0Dw/exec",
+    "https://script.google.com/macros/s/AKfycbwRSXJ7wihr2kyNVZnZM3dw9VgwI0D2iiVa4JXXwp0s4xFtzSb6rNNicLZiaOxLiYFZng/exec",
     {
       method: "POST",
        mode: 'no-cors',//local
